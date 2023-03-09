@@ -1,31 +1,37 @@
 import { Controller, Body, Post, Get } from '@nestjs/common';
+import { BaseController } from 'src/base-controller';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, VerificationDto } from './dto';
+import { CreateUserDto, LoginUserDto, VerificationDto } from './dto';
 
 @Controller('auth')
-export class AuthController 
+export class AuthController extends BaseController
 {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) {
+        super()
+    }
 
     @Post('login')
-    loginUser(@Body() payload: LoginDto) {
-        console.log({payload})
-        return this.authService.signup()
+    async loginUser(@Body() request: LoginUserDto) {
+        this.authService.loginUser(request)
+        return this.success()
     }
 
     @Post('register')
-    createUser(@Body() payload: RegisterDto) {
-        return this.authService.signup()
+    async createUser(@Body() request: CreateUserDto) {
+        const res = await this.authService.createUser(request)
+        return this.successWithData(res)
     }
 
     @Post('verification')
-    userVerification(@Body() payload: VerificationDto) {
-        return this.authService.signup()
+    async userVerification(@Body() request: VerificationDto) {
+        await this.authService.verification(request)
+        return this.success()
     }
 
     @Get('verification')
-    reUserVerification(@Body() payload: VerificationDto) {
-        return this.authService.signup()
+    async reUserVerification(@Body() request: VerificationDto) {
+        await this.authService.verification(request)
+        return this.success()
     }
     
 

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,88 +7,75 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id String @id
-
-  role Role @relation(fields: [role_id], references: [id])
-  role_id Int 
-
-  name String
-  email String 
-  password String
-  no_telp String
-  is_valid Boolean
-
+model accountverification {
+  id         String   @id
+  email      String
+  token      String
+  is_active  Boolean
   created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-
-
+  update_at  DateTime
 }
 
-model Role {
-  id Int @id @default(autoincrement())
-  name String
-
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-
-  users User[]
-  role_has_permissions RoleHasPermission[]
-}
-
-model Permission {
-  id Int @id @default(autoincrement())
-  routes String
-
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-
-  role_has_permissions RoleHasPermission[]
-}
-
-model RoleHasPermission {
-  id Int @id @default(autoincrement())
-
-  role Role @relation(fields: [role_id], references: [id])
-  role_id Int
-
-  permissions Permission @relation(fields: [permission_id], references: [id])
-  permission_id Int
-
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-}
-
-model AccountVerification {
-  id String @id
-  email String
-  token String
-  is_active Boolean
-
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-}
-
-model Provinsi {
-  id String @id
-  name String 
-
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-
-  kabupatens Kabupaten[]
-}
-
-model Kabupaten {
-  id String @id
-
-  provinsi Provinsi @relation(fields: [provinsi_id], references: [id])
+model kabupaten {
+  id          String   @id
   provinsi_id String
+  name        String
+  created_at  DateTime @default(now())
+  update_at   DateTime
+  provinsi    provinsi @relation(fields: [provinsi_id], references: [id], map: "Kabupaten_provinsi_id_fkey")
 
-  name String
-
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  @@index([provinsi_id], map: "Kabupaten_provinsi_id_fkey")
 }
 
+model permission {
+  id                Int                 @id @default(autoincrement())
+  routes            String
+  created_at        DateTime            @default(now())
+  update_at         DateTime
+  rolehaspermission rolehaspermission[]
+}
 
+model provinsi {
+  id         String      @id
+  name       String
+  created_at DateTime    @default(now())
+  update_at  DateTime
+  kabupaten  kabupaten[]
+}
+
+model role {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  created_at        DateTime            @default(now())
+  update_at         DateTime
+  rolehaspermission rolehaspermission[]
+  user              user[]
+}
+
+model rolehaspermission {
+  id            Int        @id @default(autoincrement())
+  role_id       Int
+  permission_id Int
+  created_at    DateTime   @default(now())
+  update_at     DateTime
+  permission    permission @relation(fields: [permission_id], references: [id], map: "RoleHasPermission_permission_id_fkey")
+  role          role       @relation(fields: [role_id], references: [id], map: "RoleHasPermission_role_id_fkey")
+
+  @@index([permission_id], map: "RoleHasPermission_permission_id_fkey")
+  @@index([role_id], map: "RoleHasPermission_role_id_fkey")
+}
+
+model user {
+  id         String   @id
+  role_id    Int
+  name       String
+  email      String   @unique(map: "User_email_key")
+  password   String
+  no_telp    String
+  is_valid   Boolean
+  created_at DateTime @default(now())
+  update_at  DateTime
+  role       role     @relation(fields: [role_id], references: [id], map: "User_role_id_fkey")
+
+  @@index([role_id], map: "User_role_id_fkey")
+}
