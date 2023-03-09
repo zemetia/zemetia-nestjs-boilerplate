@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id
+
+  role Role @relation(fields: [role_id], references: [id])
+  role_id Int 
+
+  name String
+  email String 
+  password String
+  no_telp String
+  is_valid Boolean
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+
+}
+
+model Role {
+  id Int @id @default(autoincrement())
+  name String
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  users User[]
+  role_has_permissions RoleHasPermission[]
+}
+
+model Permission {
+  id Int @id @default(autoincrement())
+  routes String
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  role_has_permissions RoleHasPermission[]
+}
+
+model RoleHasPermission {
+  id Int @id @default(autoincrement())
+
+  role Role @relation(fields: [role_id], references: [id])
+  role_id Int
+
+  permissions Permission @relation(fields: [permission_id], references: [id])
+  permission_id Int
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+}
+
+model AccountVerification {
+  id String @id
+  email String
+  token String
+  is_active Boolean
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+}
+
+model Provinsi {
+  id String @id
+  name String 
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  kabupatens Kabupaten[]
+}
+
+model Kabupaten {
+  id String @id
+
+  provinsi Provinsi @relation(fields: [provinsi_id], references: [id])
+  provinsi_id String
+
+  name String
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+}
+
+
