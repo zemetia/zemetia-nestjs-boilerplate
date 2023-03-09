@@ -19,7 +19,8 @@ export class RoleService {
         const role = await this.prismaService.role.update({
             where: {id: request.id},
             data: {
-                name: request.name
+                name: request.name,
+                update_at: new Date()
             }
         })
     }
@@ -29,6 +30,4 @@ export class RoleService {
             where: {id: request.id}
         })
     }
-
-
 }
